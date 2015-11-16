@@ -1,0 +1,12 @@
+[package]
+name = "xone-battery"
+version = "0.1.0"
+authors = ["kseva"]
+
+[dependencies.winapi]
+version = "*"
+path = "../winapi-rs"
+
+[dependencies.xinput-sys]
+version = "*"
+path = "../winapi-rs/lib/xinput"

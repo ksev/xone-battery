@@ -1,0 +1,24 @@
+[root]
+name = "xone-battery"
+version = "0.1.0"
+dependencies = [
+ "winapi 0.2.5",
+ "xinput-sys 0.0.1",
+]
+
+[[package]]
+name = "winapi"
+version = "0.2.5"
+
+[[package]]
+name = "winapi-build"
+version = "0.1.1"
+
+[[package]]
+name = "xinput-sys"
+version = "0.0.1"
+dependencies = [
+ "winapi 0.2.5",
+ "winapi-build 0.1.1",
+]
+
