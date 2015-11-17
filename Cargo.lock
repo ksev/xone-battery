@@ -2,8 +2,17 @@
 name = "xone-battery"
 version = "0.1.0"
 dependencies = [
+ "user32-sys 0.1.2",
  "winapi 0.2.5",
  "xinput-sys 0.0.1",
+]
+
+[[package]]
+name = "user32-sys"
+version = "0.1.2"
+dependencies = [
+ "winapi 0.2.5",
+ "winapi-build 0.1.1",
 ]
 
 [[package]]

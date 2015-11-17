@@ -10,3 +10,7 @@ path = "../winapi-rs"
 [dependencies.xinput-sys]
 version = "*"
 path = "../winapi-rs/lib/xinput"
+
+[dependencies.user32-sys]
+version = "*"
+path = "../winapi-rs/lib/user32"
