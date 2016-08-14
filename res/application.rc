@@ -1,0 +1,15 @@
+#define IDI_LAUNCH 0x101
+
+#define IDI_EMPTY 0x105
+#define IDI_LOW 0x106
+#define IDI_MEDIUM 0x107
+#define IDI_FULL 0x108
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "application.manifest"
+
+IDI_LAUNCH ICON "launch.ico"
+
+IDI_EMPTY ICON "empty.ico"
+IDI_LOW ICON "low.ico"
+IDI_MEDIUM ICON "medium.ico"
+IDI_FULL ICON "full.ico"
