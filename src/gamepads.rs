@@ -12,12 +12,8 @@ use winapi::{
     XUSER_MAX_COUNT, 
     XINPUT_BATTERY_INFORMATION,
     SUCCEEDED,
-    TRUE,
 };
-use xinput::{
-    XInputGetBatteryInformation,
-    XInputEnable,
-};
+use xinput::XInputGetBatteryInformation;
 
 #[derive(Copy, Debug, Clone, Eq, PartialEq)]
 pub enum BatteryType {
@@ -53,36 +49,35 @@ impl BatteryInfo {
     }
 }
 
-pub fn battery() -> Vec<BatteryInfo> {
-    let mut res = vec![];
+pub fn battery() -> impl Iterator<Item=BatteryInfo> {
+    (0..XUSER_MAX_COUNT).filter_map(|user_index| {
+        unsafe {         
+            let mut xinfo: XINPUT_BATTERY_INFORMATION = std::mem::zeroed();
+            let err = XInputGetBatteryInformation(
+                user_index, BATTERY_DEVTYPE_GAMEPAD, 
+                &mut xinfo as *mut XINPUT_BATTERY_INFORMATION
+            );
 
-    unsafe { XInputEnable(TRUE); } 
+            if SUCCEEDED(err as i32) {
+                let typ = match xinfo.BatteryType {
+                    BATTERY_TYPE_DISCONNECTED => BatteryType::Disconnected,
+                    BATTERY_TYPE_WIRED => BatteryType::Wired,
+                    BATTERY_TYPE_NIMH => BatteryType::Nmh,
+                    BATTERY_TYPE_ALKALINE => BatteryType::Alkaline,
+                    _ => BatteryType::Unknown,
+                };
+                
+                let lvl = match xinfo.BatteryLevel {                
+                    BATTERY_LEVEL_LOW => BatteryLevel::Low,
+                    BATTERY_LEVEL_MEDIUM => BatteryLevel::Medium,
+                    BATTERY_LEVEL_FULL => BatteryLevel::Full,
+                    _ => BatteryLevel::Empty,
+                };
 
-    for user_index in 0..XUSER_MAX_COUNT {      
-      unsafe {         
-        let mut xinfo: XINPUT_BATTERY_INFORMATION = std::mem::zeroed();
-        let err = XInputGetBatteryInformation(user_index, BATTERY_DEVTYPE_GAMEPAD, &mut xinfo as *mut XINPUT_BATTERY_INFORMATION);
-
-        if SUCCEEDED(err as i32) {
-            let typ = match xinfo.BatteryType {
-                BATTERY_TYPE_DISCONNECTED => BatteryType::Disconnected,
-                BATTERY_TYPE_WIRED => BatteryType::Wired,
-                BATTERY_TYPE_NIMH => BatteryType::Nmh,
-                BATTERY_TYPE_ALKALINE => BatteryType::Alkaline,
-                _ => BatteryType::Unknown,
-            };
-            
-            let lvl = match xinfo.BatteryLevel {                
-                BATTERY_LEVEL_LOW => BatteryLevel::Low,
-                BATTERY_LEVEL_MEDIUM => BatteryLevel::Medium,
-                BATTERY_LEVEL_FULL => BatteryLevel::Full,
-                _ => BatteryLevel::Empty,
-            };
-
-            res.push(BatteryInfo::new(user_index, typ, lvl));
+                Some(BatteryInfo::new(user_index, typ, lvl))
+            } else {
+                None
+            }
         }
-      }
-    }
-
-    res
+    })
 }

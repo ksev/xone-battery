@@ -1,9 +1,8 @@
 #define IDI_LAUNCH 0x101
-
-#define IDI_EMPTY 0x105
-#define IDI_LOW 0x106
-#define IDI_MEDIUM 0x107
-#define IDI_FULL 0x108
+#define IDI_EMPTY 0x102
+#define IDI_LOW 0x103
+#define IDI_MEDIUM 0x104
+#define IDI_FULL 0x105
 
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "application.manifest"
 

@@ -14,3 +14,6 @@ version = "0.2.0"
 
 [dependencies.comctl32-sys]
 version = "0.2.0"
+
+[dependencies.kernel32-sys]
+version = "0.2.2"
