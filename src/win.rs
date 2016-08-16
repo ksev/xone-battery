@@ -1,13 +1,15 @@
+use std;
+use std::ffi::OsStr;
+use std::os::windows::ffi::OsStrExt;
+
+use uuid;
+
 use winapi;
 use kernel32;
 use user32;
 use shell32;
 
-use std;
-use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
-
-trait ToWin {
+pub trait ToWin {
     type Out;
     fn to_win(&self) -> Self::Out;
 }
@@ -22,7 +24,30 @@ impl<'a> ToWin for &'a str {
     }
 }
 
-DEFINE_GUID!(ICON_GUID, 0xbe9cce0f, 0x62ef, 0x4bf2, 0x8b, 0x95, 0x4a, 0x52, 0x49, 0xe1, 0x2a, 0xaa);
+impl ToWin for uuid::Uuid {
+    type Out = winapi::GUID;
+
+    fn to_win(&self) -> Self::Out {
+        let bytes = self.as_bytes();
+        let end = [
+            bytes[ 8],
+            bytes[ 9],
+            bytes[10],
+            bytes[11],
+            bytes[12],
+            bytes[13],
+            bytes[14],
+            bytes[15]
+        ];
+
+        winapi::GUID {
+            Data1: ((bytes[0] as u32) << 24 | (bytes[1] as u32) << 16 | (bytes[2] as u32) << 8 | (bytes[3] as u32)),
+            Data2: ((bytes[4] as u16) << 8 | (bytes[5] as u16)),
+            Data3: ((bytes[6] as u16) << 8 | (bytes[7] as u16)),
+            Data4: end,
+        }
+    }
+}
 
 pub fn initialize() -> Option<winapi::HWND> {
     let class_name = "xboxone-battery-class".to_win();
@@ -67,7 +92,7 @@ pub fn initialize() -> Option<winapi::HWND> {
     }
 }
 
-pub fn add_icon(hwnd: winapi::HWND, res_id: isize) -> bool {
+pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());        
         let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
@@ -76,7 +101,7 @@ pub fn add_icon(hwnd: winapi::HWND, res_id: isize) -> bool {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
             hWnd: hwnd,
             uFlags: winapi::NIF_ICON | winapi::NIF_GUID,
-            guidItem: ICON_GUID,
+            guidItem: id,
             hIcon: icon,
             uID: 0,
             uCallbackMessage: 0,
@@ -94,7 +119,7 @@ pub fn add_icon(hwnd: winapi::HWND, res_id: isize) -> bool {
     }
 }
 
-pub fn change_icon(hwnd: winapi::HWND, res_id: isize) -> bool {
+pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());        
         let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
@@ -103,7 +128,7 @@ pub fn change_icon(hwnd: winapi::HWND, res_id: isize) -> bool {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
             hWnd: hwnd,
             uFlags: winapi::NIF_ICON | winapi::NIF_GUID,
-            guidItem: ICON_GUID,
+            guidItem: id,
             hIcon: icon,
             uID: 0,
             uCallbackMessage: 0,
