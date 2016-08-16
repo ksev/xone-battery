@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Kim Sevandersson<ksevandersson@gmail.com>"]
 
 [dependencies]
-uuid = { version = "0.3.0", features = ["v4"] }
+uuid = { version = "0.3.0", features = ["v5"] }
 
 [dependencies.winapi]
 git = "https://github.com/retep998/winapi-rs"

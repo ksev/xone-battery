@@ -1,6 +1,5 @@
 #![feature(conservative_impl_trait)]
 extern crate uuid;
-#[macro_use(DEFINE_GUID)]
 extern crate winapi;
 extern crate xinput;
 extern crate user32;
@@ -23,7 +22,9 @@ const IDI_FULL: isize = 0x105;
 const IDI_NONE: isize = 0x106;
 
 fn main() {
-    let guid = Uuid::new_v4().to_win();
+    let path = std::env::current_exe().expect("Could not get current path");
+    let guid = Uuid::new_v5(&uuid::NAMESPACE_OID, path.to_str().unwrap()).to_win();
+
     let hwnd = win::initialize().expect("Could not initialize window");
     
     win::add_icon(hwnd, guid, IDI_NONE);
