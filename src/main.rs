@@ -1,62 +1,43 @@
 #![feature(conservative_impl_trait)]
+#[macro_use(DEFINE_GUID)]
+
 extern crate winapi;
 extern crate xinput;
 extern crate user32;
-extern crate comctl32;
 extern crate kernel32;
+extern crate shell32;
 
-use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
+mod win;
+mod gamepads;
+
+use gamepads::{BatteryType, BatteryLevel};
+use std::thread::sleep;
+use std::time::Duration;
+
+const IDI_EMPTY: isize = 0x102;
+const IDI_LOW: isize = 0x103;
+const IDI_MEDIUM: isize = 0x104;
+const IDI_FULL: isize = 0x105;
+const IDI_NONE: isize = 0x106;
 
 fn main() {
-    let class_name = encode_wide("xboxone-battery-class");    
+    let hwnd = win::initialize().expect("Could not initialize window");
+    win::add_icon(hwnd, IDI_NONE);
+    
+    loop {
+        let pad = gamepads::battery()
+            .filter(|bat| bat.kind != BatteryType::Disconnected).nth(0);
 
-    unsafe {
-        let module = kernel32::GetModuleHandleW(std::ptr::null());
-        
-        let wnd = winapi::WNDCLASSW {
-            style: 0,
-            lpfnWndProc: Some(window_proc),
-            hInstance: module,
-            hIcon: std::ptr::null_mut(),
-            hCursor: std::ptr::null_mut(),
-            lpszClassName: class_name.as_ptr(),
-            hbrBackground: winapi::COLOR_WINDOW as winapi::HBRUSH,
-            lpszMenuName: std::ptr::null_mut(),
-            cbClsExtra: 0,
-            cbWndExtra: 0,
-        };
+        match pad {
+            Some(info) => match info.level {
+                BatteryLevel::Empty => win::change_icon(hwnd, IDI_EMPTY),
+                BatteryLevel::Low => win::change_icon(hwnd, IDI_LOW),
+                BatteryLevel::Medium => win::change_icon(hwnd, IDI_MEDIUM),
+                BatteryLevel::Full => win::change_icon(hwnd, IDI_FULL),
+            },
+            None => win::change_icon(hwnd, IDI_NONE),
+        } ;
 
-        let atom = user32::RegisterClassW(&wnd);
-
-        println!("{:?}", atom);
-
-        let hwnd = user32::CreateWindowExW(
-           0, atom as winapi::LPCWSTR, 
-           encode_wide("xboxone-battery-window").as_ptr(), 
-           0, 0, 0, 0, 0, winapi::HWND_MESSAGE, 
-           std::ptr::null_mut(), 
-           std::ptr::null_mut(), 
-           std::ptr::null_mut()); 
-
-        println!("{:?}", hwnd);
-
-        std::thread::sleep(std::time::Duration::from_secs(15));            
+        sleep(Duration::from_secs(10));
     }
-}
-
-
-pub unsafe extern "system" fn window_proc(h_wnd: winapi::HWND, 
-	msg: winapi::UINT, w_param: winapi::WPARAM, l_param: winapi::LPARAM) -> winapi::LRESULT
-{
-    if msg == winapi::winuser::WM_DESTROY {
-        user32::PostQuitMessage(0);
-    }
-    return user32::DefWindowProcW(h_wnd, msg, w_param, l_param);
-}
-
-fn encode_wide<'a>(input: &'a str) -> Vec<u16> {
-    OsStr::new(input).encode_wide()
-                     .chain(std::iter::once(0))
-                     .collect()
 }

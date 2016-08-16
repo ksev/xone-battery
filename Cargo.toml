@@ -4,16 +4,16 @@ version = "0.1.0"
 authors = ["Kim Sevandersson<ksevandersson@gmail.com>"]
 
 [dependencies.winapi]
-version = "0.2.8"
+git = "https://github.com/retep998/winapi-rs"
 
 [dependencies.xinput-sys]
-version = "0.2.0"
+git = "https://github.com/retep998/winapi-rs"
 
 [dependencies.user32-sys]
-version = "0.2.0"
-
-[dependencies.comctl32-sys]
-version = "0.2.0"
+git = "https://github.com/retep998/winapi-rs"
 
 [dependencies.kernel32-sys]
-version = "0.2.2"
+git = "https://github.com/retep998/winapi-rs"
+
+[dependencies.shell32-sys]
+git = "https://github.com/retep998/winapi-rs"

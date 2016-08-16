@@ -3,6 +3,7 @@
 #define IDI_LOW 0x103
 #define IDI_MEDIUM 0x104
 #define IDI_FULL 0x105
+#define IDI_NONE 0x106
 
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "application.manifest"
 
@@ -12,3 +13,4 @@ IDI_EMPTY ICON "empty.ico"
 IDI_LOW ICON "low.ico"
 IDI_MEDIUM ICON "medium.ico"
 IDI_FULL ICON "full.ico"
+IDI_NONE ICON "none.ico"
