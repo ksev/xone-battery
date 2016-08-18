@@ -60,7 +60,7 @@ pub fn initialize() -> Option<winapi::HWND> {
             style: 0,
             lpfnWndProc: Some(window_proc),
             hInstance: module,
-            hIcon: user32::LoadIconW(module, std::mem::transmute(0x101)),
+            hIcon: user32::LoadIconW(module, std::mem::transmute(0x106)),
             hCursor: std::ptr::null_mut(),
             lpszClassName: class_name.as_ptr(),
             hbrBackground: winapi::COLOR_WINDOW as winapi::HBRUSH,
@@ -92,7 +92,12 @@ pub fn initialize() -> Option<winapi::HWND> {
     }
 }
 
-pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
+pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) -> bool {
+    let mut array = [0 as winapi::WCHAR; 128];
+    for (&x, p) in tip.to_win().iter().zip(array.iter_mut()) {
+        *p = x;
+    }
+
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());        
         let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
@@ -100,12 +105,12 @@ pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
         let mut nid = winapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
             hWnd: hwnd,
-            uFlags: winapi::NIF_ICON | winapi::NIF_GUID,
+            uFlags: winapi::NIF_ICON | winapi::NIF_GUID | winapi::NIF_TIP,
             guidItem: id,
             hIcon: icon,
             uID: 0,
             uCallbackMessage: 0,
-            szTip: [0; 128],
+            szTip: array,
             dwState: 0,
             dwStateMask: 0,
             szInfo: [0; 256],
@@ -119,7 +124,12 @@ pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
     }
 }
 
-pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool {
+pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) -> bool {
+    let mut array = [0 as winapi::WCHAR; 128];
+    for (&x, p) in tip.to_win().iter().zip(array.iter_mut()) {
+        *p = x;
+    }
+
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());        
         let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
@@ -127,12 +137,12 @@ pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize) -> bool 
         let mut nid = winapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
             hWnd: hwnd,
-            uFlags: winapi::NIF_ICON | winapi::NIF_GUID,
+            uFlags: winapi::NIF_ICON | winapi::NIF_GUID | winapi::NIF_TIP,
             guidItem: id,
             hIcon: icon,
             uID: 0,
             uCallbackMessage: 0,
-            szTip: [0; 128],
+            szTip: array,
             dwState: 0,
             dwStateMask: 0,
             szInfo: [0; 256],
