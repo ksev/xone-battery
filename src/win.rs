@@ -60,7 +60,7 @@ pub fn initialize() -> Option<winapi::HWND> {
             style: 0,
             lpfnWndProc: Some(window_proc),
             hInstance: module,
-            hIcon: user32::LoadIconW(module, std::mem::transmute(0x106)),
+            hIcon: std::ptr::null_mut(),
             hCursor: std::ptr::null_mut(),
             lpszClassName: class_name.as_ptr(),
             hbrBackground: winapi::COLOR_WINDOW as winapi::HBRUSH,

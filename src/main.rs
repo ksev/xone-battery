@@ -1,4 +1,5 @@
 #![feature(conservative_impl_trait)]
+
 extern crate uuid;
 extern crate winapi;
 extern crate xinput;

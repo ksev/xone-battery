@@ -20,3 +20,7 @@ git = "https://github.com/retep998/winapi-rs"
 
 [dependencies.shell32-sys]
 git = "https://github.com/retep998/winapi-rs"
+
+[profile.release]
+lto = true
+panic = 'abort'
