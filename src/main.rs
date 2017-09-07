@@ -27,22 +27,29 @@ fn main() {
     let guid = Uuid::new_v5(&uuid::NAMESPACE_OID, path.to_str().unwrap()).to_win();
 
     let hwnd = win::initialize().expect("Could not initialize window");
-    
+
     win::add_icon(hwnd, guid, IDI_NONE, "No controller connected");
-    
+
     loop {
         let pad = gamepads::battery()
-            .filter(|bat| bat.kind != BatteryType::Disconnected).nth(0);
+            .filter(|bat| bat.kind != BatteryType::Disconnected)
+            .nth(0);
 
         match pad {
-            Some(info) => match info.level {
-                BatteryLevel::Empty => win::change_icon(hwnd, guid, IDI_EMPTY, "Battery is empty"),
-                BatteryLevel::Low => win::change_icon(hwnd, guid, IDI_LOW, "Battery is low"),
-                BatteryLevel::Medium => win::change_icon(hwnd, guid, IDI_MEDIUM, "Battery is half full"),
-                BatteryLevel::Full => win::change_icon(hwnd, guid, IDI_FULL, "Battery is full"),
-            },
+            Some(info) => {
+                match info.level {
+                    BatteryLevel::Empty => {
+                        win::change_icon(hwnd, guid, IDI_EMPTY, "Battery is empty")
+                    }
+                    BatteryLevel::Low => win::change_icon(hwnd, guid, IDI_LOW, "Battery is low"),
+                    BatteryLevel::Medium => {
+                        win::change_icon(hwnd, guid, IDI_MEDIUM, "Battery is half full")
+                    }
+                    BatteryLevel::Full => win::change_icon(hwnd, guid, IDI_FULL, "Battery is full"),
+                }
+            }
             None => win::change_icon(hwnd, guid, IDI_NONE, "No controller connected"),
-        } ;
+        };
 
         sleep(Duration::from_secs(10));
     }

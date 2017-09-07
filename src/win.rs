@@ -18,7 +18,8 @@ impl<'a> ToWin for &'a str {
     type Out = Vec<u16>;
 
     fn to_win(&self) -> Self::Out {
-        OsStr::new(self).encode_wide()
+        OsStr::new(self)
+            .encode_wide()
             .chain(std::iter::once(0))
             .collect()
     }
@@ -29,19 +30,12 @@ impl ToWin for uuid::Uuid {
 
     fn to_win(&self) -> Self::Out {
         let bytes = self.as_bytes();
-        let end = [
-            bytes[ 8],
-            bytes[ 9],
-            bytes[10],
-            bytes[11],
-            bytes[12],
-            bytes[13],
-            bytes[14],
-            bytes[15]
-        ];
+        let end = [bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14],
+                   bytes[15]];
 
         winapi::GUID {
-            Data1: ((bytes[0] as u32) << 24 | (bytes[1] as u32) << 16 | (bytes[2] as u32) << 8 | (bytes[3] as u32)),
+            Data1: ((bytes[0] as u32) << 24 | (bytes[1] as u32) << 16 | (bytes[2] as u32) << 8 |
+                    (bytes[3] as u32)),
             Data2: ((bytes[4] as u16) << 8 | (bytes[5] as u16)),
             Data3: ((bytes[6] as u16) << 8 | (bytes[7] as u16)),
             Data4: end,
@@ -55,7 +49,7 @@ pub fn initialize() -> Option<winapi::HWND> {
 
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());
-        
+
         let wnd = winapi::WNDCLASSW {
             style: 0,
             lpfnWndProc: Some(window_proc),
@@ -75,20 +69,24 @@ pub fn initialize() -> Option<winapi::HWND> {
             return None;
         }
 
-        let hwnd = user32::CreateWindowExW(
-           0, atom as winapi::LPCWSTR, 
-           window_name.as_ptr(), 
-           winapi::WS_DISABLED,
-           0, 0, 0, 0, user32::GetDesktopWindow(), 
-           std::ptr::null_mut(), 
-           std::ptr::null_mut(), 
-           std::ptr::null_mut()); 
-        
+        let hwnd = user32::CreateWindowExW(0,
+                                           atom as winapi::LPCWSTR,
+                                           window_name.as_ptr(),
+                                           winapi::WS_DISABLED,
+                                           0,
+                                           0,
+                                           0,
+                                           0,
+                                           user32::GetDesktopWindow(),
+                                           std::ptr::null_mut(),
+                                           std::ptr::null_mut(),
+                                           std::ptr::null_mut());
+
         if hwnd.is_null() {
             return None;
         }
 
-        return Some(hwnd)
+        return Some(hwnd);
     }
 }
 
@@ -99,8 +97,8 @@ pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) 
     }
 
     unsafe {
-        let module = kernel32::GetModuleHandleW(std::ptr::null());        
-        let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
+        let module = kernel32::GetModuleHandleW(std::ptr::null());
+        let icon = user32::LoadIconW(module, std::mem::transmute(res_id));
 
         let mut nid = winapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
@@ -117,7 +115,7 @@ pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) 
             uTimeout: 0,
             szInfoTitle: [0; 64],
             dwInfoFlags: 0,
-            hBalloonIcon: std::ptr::null_mut()
+            hBalloonIcon: std::ptr::null_mut(),
         };
 
         shell32::Shell_NotifyIconW(winapi::NIM_ADD, &mut nid as winapi::PNOTIFYICONDATAW) == 1
@@ -131,8 +129,8 @@ pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &st
     }
 
     unsafe {
-        let module = kernel32::GetModuleHandleW(std::ptr::null());        
-        let icon = user32::LoadIconW(module, std::mem::transmute(res_id));           
+        let module = kernel32::GetModuleHandleW(std::ptr::null());
+        let icon = user32::LoadIconW(module, std::mem::transmute(res_id));
 
         let mut nid = winapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<winapi::NOTIFYICONDATAW>() as u32,
@@ -149,16 +147,18 @@ pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &st
             uTimeout: 0,
             szInfoTitle: [0; 64],
             dwInfoFlags: 0,
-            hBalloonIcon: std::ptr::null_mut()
+            hBalloonIcon: std::ptr::null_mut(),
         };
 
         shell32::Shell_NotifyIconW(winapi::NIM_MODIFY, &mut nid as winapi::PNOTIFYICONDATAW) == 1
     }
 }
 
-pub unsafe extern "system" fn window_proc(h_wnd: winapi::HWND, 
-	msg: winapi::UINT, w_param: winapi::WPARAM, l_param: winapi::LPARAM) -> winapi::LRESULT
-{
+pub unsafe extern "system" fn window_proc(h_wnd: winapi::HWND,
+                                          msg: winapi::UINT,
+                                          w_param: winapi::WPARAM,
+                                          l_param: winapi::LPARAM)
+                                          -> winapi::LRESULT {
     if msg == winapi::winuser::WM_DESTROY {
         user32::PostQuitMessage(0);
     }

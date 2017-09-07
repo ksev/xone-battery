@@ -1,18 +1,8 @@
 ﻿use std;
 
-use winapi::{
-    BATTERY_TYPE_DISCONNECTED,
-    BATTERY_TYPE_WIRED,
-    BATTERY_TYPE_NIMH,
-    BATTERY_TYPE_ALKALINE,
-    BATTERY_LEVEL_LOW,
-    BATTERY_LEVEL_MEDIUM,
-    BATTERY_LEVEL_FULL,
-    BATTERY_DEVTYPE_GAMEPAD, 
-    XUSER_MAX_COUNT, 
-    XINPUT_BATTERY_INFORMATION,
-    SUCCEEDED,
-};
+use winapi::{BATTERY_TYPE_DISCONNECTED, BATTERY_TYPE_WIRED, BATTERY_TYPE_NIMH,
+             BATTERY_TYPE_ALKALINE, BATTERY_LEVEL_LOW, BATTERY_LEVEL_MEDIUM, BATTERY_LEVEL_FULL,
+             BATTERY_DEVTYPE_GAMEPAD, XUSER_MAX_COUNT, XINPUT_BATTERY_INFORMATION, SUCCEEDED};
 use xinput::XInputGetBatteryInformation;
 
 #[derive(Copy, Debug, Clone, Eq, PartialEq)]
@@ -49,7 +39,7 @@ impl BatteryInfo {
     }
 }
 
-pub fn battery() -> impl Iterator<Item=BatteryInfo> {
+pub fn battery() -> impl Iterator<Item = BatteryInfo> {
     (0..XUSER_MAX_COUNT).filter_map(|user_index| {
         unsafe {         
             let mut xinfo: XINPUT_BATTERY_INFORMATION = std::mem::zeroed();

@@ -4,6 +4,7 @@ xone-battery is a super simple windows application that adds the battery status 
 I tried to itegrate the application as cleanly as possible into windows 10 and it's look and feel.
 
 #### Screenshots
+This is all the app does. Displays the current battery state.
 
 | State                   | Image                     |
 | ----------------------- |:-------------------------:|
