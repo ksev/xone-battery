@@ -14,15 +14,10 @@ pub trait ToWin {
     fn to_win(&self) -> Self::Out;
 }
 
-impl<'a> ToWin for &'a str {
-    type Out = Vec<u16>;
-
-    fn to_win(&self) -> Self::Out {
-        OsStr::new(self)
-            .encode_wide()
-            .chain(std::iter::once(0))
-            .collect()
-    }
+fn win_str<'a>(data: &'a str) -> impl Iterator<Item=u16> + 'a {
+    OsStr::new(data)
+        .encode_wide()
+        .chain(std::iter::once(0))
 }
 
 impl ToWin for uuid::Uuid {
@@ -44,8 +39,8 @@ impl ToWin for uuid::Uuid {
 }
 
 pub fn initialize() -> Option<winapi::HWND> {
-    let class_name = "xboxone-battery-class".to_win();
-    let window_name = "xboxone-battery-window".to_win();
+    let class_name = win_str("xboxone-battery-class").collect::<Vec<_>>();
+    let window_name = win_str("xboxone-battery-window").collect::<Vec<_>>();
 
     unsafe {
         let module = kernel32::GetModuleHandleW(std::ptr::null());
@@ -92,7 +87,7 @@ pub fn initialize() -> Option<winapi::HWND> {
 
 pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) -> bool {
     let mut array = [0 as winapi::WCHAR; 128];
-    for (&x, p) in tip.to_win().iter().zip(array.iter_mut()) {
+    for (x, p) in win_str(tip).zip(array.iter_mut()) {
         *p = x;
     }
 
@@ -124,7 +119,7 @@ pub fn add_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) 
 
 pub fn change_icon(hwnd: winapi::HWND, id: winapi::GUID, res_id: isize, tip: &str) -> bool {
     let mut array = [0 as winapi::WCHAR; 128];
-    for (&x, p) in tip.to_win().iter().zip(array.iter_mut()) {
+    for (x, p) in win_str(tip).zip(array.iter_mut()) {
         *p = x;
     }
 

@@ -12,7 +12,6 @@ mod gamepads;
 
 use uuid::Uuid;
 use gamepads::{BatteryType, BatteryLevel};
-use std::thread::sleep;
 use std::time::Duration;
 use win::ToWin;
 
@@ -51,6 +50,6 @@ fn main() {
             None => win::change_icon(hwnd, guid, IDI_NONE, "No controller connected"),
         };
 
-        sleep(Duration::from_secs(10));
+        std::thread::sleep(Duration::from_secs(10));
     }
 }
