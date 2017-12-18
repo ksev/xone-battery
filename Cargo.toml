@@ -5,22 +5,13 @@ authors = ["Kim Sevandersson<ksevandersson@gmail.com>"]
 
 [dependencies]
 uuid = { version = "0.3.0", features = ["v5"] }
-
-[dependencies.winapi]
-git = "https://github.com/retep998/winapi-rs"
-
-[dependencies.xinput-sys]
-git = "https://github.com/retep998/winapi-rs"
-
-[dependencies.user32-sys]
-git = "https://github.com/retep998/winapi-rs"
-
-[dependencies.kernel32-sys]
-git = "https://github.com/retep998/winapi-rs"
-
-[dependencies.shell32-sys]
-git = "https://github.com/retep998/winapi-rs"
+winapi = { version = "0.3", features = ["xinput", "winuser", "shellapi", "std", "libloaderapi", "winerror"] }
 
 [profile.release]
+opt-level = 3
+debug = false
+rpath = false
 lto = true
+debug-assertions = false
+codegen-units = 1
 panic = 'abort'

@@ -2,16 +2,12 @@
 
 extern crate uuid;
 extern crate winapi;
-extern crate xinput;
-extern crate user32;
-extern crate kernel32;
-extern crate shell32;
 
 mod win;
 mod gamepads;
 
 use uuid::Uuid;
-use gamepads::{BatteryType, BatteryLevel};
+use gamepads::BatteryType;
 use std::time::Duration;
 use win::ToWin;
 
@@ -36,20 +32,18 @@ fn main() {
 
         match pad {
             Some(info) => {
+                use gamepads::BatteryLevel::*;
+                
                 match info.level {
-                    BatteryLevel::Empty => {
-                        win::change_icon(hwnd, guid, IDI_EMPTY, "Battery is empty")
-                    }
-                    BatteryLevel::Low => win::change_icon(hwnd, guid, IDI_LOW, "Battery is low"),
-                    BatteryLevel::Medium => {
-                        win::change_icon(hwnd, guid, IDI_MEDIUM, "Battery is half full")
-                    }
-                    BatteryLevel::Full => win::change_icon(hwnd, guid, IDI_FULL, "Battery is full"),
+                    Empty => win::change_icon(hwnd, guid, IDI_EMPTY, "Battery is empty"),
+                    Low => win::change_icon(hwnd, guid, IDI_LOW, "Battery is low"),
+                    Medium => win::change_icon(hwnd, guid, IDI_MEDIUM, "Battery is half full"),
+                    Full => win::change_icon(hwnd, guid, IDI_FULL, "Battery is full"),
                 }
             }
             None => win::change_icon(hwnd, guid, IDI_NONE, "No controller connected"),
         };
 
-        std::thread::sleep(Duration::from_secs(10));
+        std::thread::sleep(Duration::from_secs(5));
     }
 }
