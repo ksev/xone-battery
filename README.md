@@ -22,4 +22,3 @@ This is all the app does. Displays the current battery state.
 
 #### Building
 As of the time of writing xone-battery requires nightly rustc to compile since it uses the `impl Trait` feature that is not yet stable. 
-You should also execute the `build.ps1` powershell script to build since it needs to pass a few parameters to rustc for the program to link correctly.
