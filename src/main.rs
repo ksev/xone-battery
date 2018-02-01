@@ -1,4 +1,5 @@
 #![feature(conservative_impl_trait)]
+#![windows_subsystem = "windows"]
 
 extern crate uuid;
 extern crate winapi;
