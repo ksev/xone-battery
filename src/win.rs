@@ -1,8 +1,4 @@
 use std;
-use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
-
-use uuid;
 
 use winapi::shared::guiddef::GUID;
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
@@ -13,37 +9,18 @@ use winapi::um::winuser;
 use winapi::um::libloaderapi;
 use winapi::um::shellapi;
 
-pub trait ToWin {
-    type Out;
-    fn to_win(&self) -> Self::Out;
-}
-
-fn win_str<'a>(data: &'a str) -> impl Iterator<Item = u16> + 'a {
-    OsStr::new(data).encode_wide().chain(std::iter::once(0))
-}
-
-impl ToWin for uuid::Uuid {
-    type Out = GUID;
-
-    fn to_win(&self) -> Self::Out {
-        let bytes = self.as_bytes();
-        let end = [
-            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
-        ];
-
-        GUID {
-            Data1: ((bytes[0] as u32) << 24 | (bytes[1] as u32) << 16 | (bytes[2] as u32) << 8
-                | (bytes[3] as u32)),
-            Data2: ((bytes[4] as u16) << 8 | (bytes[5] as u16)),
-            Data3: ((bytes[6] as u16) << 8 | (bytes[7] as u16)),
-            Data4: end,
-        }
-    }
-}
-
 pub fn initialize() -> Option<HWND> {
-    let class_name = win_str("xboxone-battery-class").collect::<Vec<_>>();
-    let window_name = win_str("xboxone-battery-window").collect::<Vec<_>>();
+    // "xboxone-battery-class"
+    const CLASS_NAME: &[u16] = &[
+        120, 98, 111, 120, 111, 110, 101, 45, 98, 97, 
+        116, 116, 101, 114, 121, 45, 99, 108, 97, 115, 115, 0
+    ];
+
+    // "xboxone-battery-window"
+    const WINDOW_NAME: &[u16] = &[
+        120, 98, 111, 120, 111, 110, 101, 45, 98, 97, 116, 116, 
+        101, 114, 121, 45, 119, 105, 110, 100, 111, 119, 0
+    ];
 
     unsafe {
         let module = libloaderapi::GetModuleHandleW(std::ptr::null());
@@ -54,7 +31,7 @@ pub fn initialize() -> Option<HWND> {
             hInstance: module,
             hIcon: std::ptr::null_mut(),
             hCursor: std::ptr::null_mut(),
-            lpszClassName: class_name.as_ptr(),
+            lpszClassName: CLASS_NAME.as_ptr(),
             hbrBackground: winuser::COLOR_WINDOW as HBRUSH,
             lpszMenuName: std::ptr::null_mut(),
             cbClsExtra: 0,
@@ -70,7 +47,7 @@ pub fn initialize() -> Option<HWND> {
         let hwnd = winuser::CreateWindowExW(
             0,
             atom as LPCWSTR,
-            window_name.as_ptr(),
+            WINDOW_NAME.as_ptr(),
             winuser::WS_DISABLED,
             0,
             0,
@@ -90,10 +67,10 @@ pub fn initialize() -> Option<HWND> {
     }
 }
 
-pub fn add_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &str) -> bool {
+pub fn add_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &'static [u16]) -> bool {
     let mut array = [0 as WCHAR; 128];
-    for (x, p) in win_str(tip).zip(array.iter_mut()) {
-        *p = x;
+    for (x, p) in tip.iter().zip(array.iter_mut()) {
+        *p = *x;
     }
 
     unsafe {
@@ -122,10 +99,10 @@ pub fn add_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &str) -> bool {
     }
 }
 
-pub fn change_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &str) -> bool {
+pub fn change_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &'static [u16]) -> bool {
     let mut array = [0 as WCHAR; 128];
-    for (x, p) in win_str(tip).zip(array.iter_mut()) {
-        *p = x;
+    for (x, p) in tip.iter().zip(array.iter_mut()) {
+        *p = *x;
     }
 
     unsafe {

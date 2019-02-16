@@ -2,6 +2,7 @@
 name = "xone-battery"
 version = "0.1.0"
 authors = ["Kim Sevandersson<ksevandersson@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 uuid = { version = "0.3.0", features = ["v5"] }

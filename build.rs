@@ -2,7 +2,7 @@ use std::process::Command;
 
 fn main() {
     let profile = std::env::var("PROFILE").unwrap();
-    let binary = r#"C:\Program Files (x86)\Windows Kits\10\bin\x64\rc.exe"#;
+    let binary = r#"C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\rc.exe"#;
     
     Command::new(binary)
         .args(&["/r", "res/application.rc"])

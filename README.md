@@ -19,6 +19,3 @@ This is all the app does. Displays the current battery state.
 [low-ex]: https://raw.githubusercontent.com/ksev/xone-battery/master/res/low_ex.png
 [medium-ex]: https://raw.githubusercontent.com/ksev/xone-battery/master/res/medium_ex.png
 [full-ex]: https://raw.githubusercontent.com/ksev/xone-battery/master/res/full_ex.png
-
-#### Building
-As of the time of writing xone-battery requires nightly rustc to compile since it uses the `impl Trait` feature that is not yet stable. 
