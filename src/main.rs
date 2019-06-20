@@ -4,6 +4,7 @@ mod win;
 mod gamepads;
 
 use std::time::Duration;
+use std::error::Error;
 
 use uuid::Uuid;
 use gamepads::BatteryType;
@@ -25,11 +26,10 @@ const BATTERY_LOW: &[u16] = &[66, 97, 116, 116, 101, 114, 121, 32, 105, 115, 32,
 const BATTERY_MEDIUM: &[u16] = &[66, 97, 116, 116, 101, 114, 121, 32, 105, 115, 32, 104, 97, 108, 102, 32, 102, 117, 108, 108, 0];
 const BATTERY_FULL: &[u16] = &[66, 97, 116, 116, 101, 114, 121, 32, 105, 115, 32, 102, 117, 108, 108, 0];
 
-fn main() {
-    let path = std::env::current_exe().expect("Could not get current path");
-    let guid = uuid_to_guid(Uuid::new_v5(&uuid::NAMESPACE_OID, path.to_str().unwrap()));
-
-    let hwnd = win::initialize().expect("Could not initialize window");
+fn main() -> Result<(), Box<Error>> {
+    let path = std::env::current_exe()?;
+    let guid = uuid_to_guid(Uuid::new_v5(&Uuid::NAMESPACE_OID, path.to_str().ok_or("Invalid str")?.as_bytes()));
+    let hwnd = win::initialize().ok_or("Window initialization failed")?;
 
     win::add_icon(hwnd, guid, IDI_NONE, NO_CONTROLLER);
 
