@@ -33,9 +33,9 @@ pub struct BatteryInfo {
 impl BatteryInfo {
     pub fn new(id: u32, battery: BatteryType, level: BatteryLevel) -> BatteryInfo {
         BatteryInfo {
-            id: id,
-            kind: battery,
-            level: level,
+            id,
+            level,
+            kind: battery
         }
     }
 }

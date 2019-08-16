@@ -9,18 +9,11 @@ use winapi::um::winuser;
 use winapi::um::libloaderapi;
 use winapi::um::shellapi;
 
-pub fn initialize() -> Option<HWND> {
-    // "xboxone-battery-class"
-    const CLASS_NAME: &[u16] = &[
-        120, 98, 111, 120, 111, 110, 101, 45, 98, 97, 
-        116, 116, 101, 114, 121, 45, 99, 108, 97, 115, 115, 0
-    ];
+use wchar::wch_c;
 
-    // "xboxone-battery-window"
-    const WINDOW_NAME: &[u16] = &[
-        120, 98, 111, 120, 111, 110, 101, 45, 98, 97, 116, 116, 
-        101, 114, 121, 45, 119, 105, 110, 100, 111, 119, 0
-    ];
+pub fn initialize() -> Option<HWND> {
+    const CLASS_NAME: &[u16] = wch_c!("xboxone-battery-class");
+    const WINDOW_NAME: &[u16] = wch_c!("xboxone-battery-window");
 
     unsafe {
         let module = libloaderapi::GetModuleHandleW(std::ptr::null());
@@ -63,7 +56,7 @@ pub fn initialize() -> Option<HWND> {
             return None;
         }
 
-        return Some(hwnd);
+        Some(hwnd)
     }
 }
 
@@ -75,7 +68,7 @@ pub fn add_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &'static [u16]) -> boo
 
     unsafe {
         let module = libloaderapi::GetModuleHandleW(std::ptr::null());
-        let icon = winuser::LoadIconW(module, std::mem::transmute(res_id));
+        let icon = winuser::LoadIconW(module, res_id as _);
 
         let mut nid = shellapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<shellapi::NOTIFYICONDATAW>() as u32,
@@ -107,7 +100,7 @@ pub fn change_icon(hwnd: HWND, id: GUID, res_id: isize, tip: &'static [u16]) -> 
 
     unsafe {
         let module = libloaderapi::GetModuleHandleW(std::ptr::null());
-        let icon = winuser::LoadIconW(module, std::mem::transmute(res_id));
+        let icon = winuser::LoadIconW(module, res_id as _);
 
         let mut nid = shellapi::NOTIFYICONDATAW {
             cbSize: std::mem::size_of::<shellapi::NOTIFYICONDATAW>() as u32,
@@ -141,5 +134,6 @@ pub unsafe extern "system" fn window_proc(
     if msg == winuser::WM_DESTROY {
         winuser::PostQuitMessage(0);
     }
-    return winuser::DefWindowProcW(h_wnd, msg, w_param, l_param);
+    
+    winuser::DefWindowProcW(h_wnd, msg, w_param, l_param)
 }
