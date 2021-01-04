@@ -19,7 +19,7 @@ const IDI_NONE: isize = 0x106;
 
 const NO_CONTROLLER: &[u16] = wch_c!("No controller connected");
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let path = std::env::current_exe()?;
     let guid = uuid_to_guid(Uuid::new_v5(&Uuid::NAMESPACE_OID, path.to_str().ok_or("Invalid str")?.as_bytes()));
     let hwnd = win::initialize().ok_or("Window initialization failed")?;
@@ -58,8 +58,12 @@ fn uuid_to_guid(uuid: Uuid) -> winapi::shared::guiddef::GUID {
     ];
 
     GUID {
-        Data1: (u32::from(bytes[0]) << 24 | u32::from(bytes[1]) << 16 | u32::from(bytes[2]) << 8
-            | u32::from(bytes[3])),
+        Data1: (
+            u32::from(bytes[0]) << 24 | 
+            u32::from(bytes[1]) << 16 | 
+            u32::from(bytes[2]) << 8  | 
+            u32::from(bytes[3])
+        ),
         Data2: (u16::from(bytes[4]) << 8 | u16::from(bytes[5])),
         Data3: (u16::from(bytes[6]) << 8 | u16::from(bytes[7])),
         Data4: end,
